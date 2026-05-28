@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="Style.css" rel="stylesheet" />
+    <title>Document</title>
+</head>
+<body class="flex column center">
+
+    <!--button Flex Box-->
+    <div class="items flex row center item-gap wrap">
+
+        <div class="item flex column align" id="switch-one">
+
+            <div class="item-name p-t-10 flex center">
+                <h2>Switch One</h2>
+            </div>
+
+            <div class="item-state p-t-30 flex center">
+                <h1>None</h1>
+            </div>
+
+        </div>
+
+        <div class="item flex column align" id="switch-two">
+
+            <div class="item-name p-t-10 flex center">
+                <h2>Switch Two</h2>
+            </div>
+
+            <div class="item-state p-t-30 flex center">
+                <h1>None</h1>
+            </div>
+
+        </div>
+
+        <div class="item flex column align" id="switch-three">
+
+            <div class="item-name p-t-10 flex center">
+                <h2>Switch Three</h2>
+            </div>
+
+            <div class="item-state p-t-30 flex center">
+                <h1>None</h1>
+            </div>
+
+        </div>
+
+        <div class="item flex column align" id="switch-four">
+
+            <div class="item-name p-t-10 flex center">
+                <h2>Switch Four</h2>
+            </div>
+
+            <div class="item-state p-t-30 flex center">
+                <h1>None</h1>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--Control Panel Flex Box-->
+    <div class="flex row align center gap-10" id="ControlPanel">
+        <div class="circle center" id="cp-item"><img class="icon-25" src="icon/moon.png"/></div>
+        <div class="parent-close-button flex center" ><div class="close-button" id="close-button"></div></div>
+        <div class="circle center wifi-setting" id="cp-item"><img class="icon-25" src="icon/wifi.png"/></div>
+    </div>
+
+    <!--WiFi Setting Panel-->
+    <div class="wifi-setting-panel flex center">
+
+        <div class="wifi-indent flex center gap-40 column">
+
+            <label for="wifi-name">WiFi Name</label>
+
+            <div class="flex column center gap-10" style="width: inherit;">
+                <input type="text" id="wifi-name"  name="wifi-name" minlength="0" maxlength="31" placeholder="Type new name for access point"/>
+                <div class="send-button flex row center gap-10">
+                    <h1 class="button-text">Send WiFi Name</h1>
+                    <img class="icon-25" src="icon/send.png"/>
+                </div>
+            </div>
+
+            <label for="wifi-password">WiFi Password</label>
+
+            <div class="flex column center gap-10" style="width: inherit;">
+                <div class="flex row center gap-10">
+                    <input type="password" id="wifi-password" name="wifi-password" minlength="8" maxlength="31" placeholder="Type new password for access point"/>
+                    <div class="flex center circle"><img class="icon-25" src="icon/eye.svg"/></div>
+                </div>
+                <div class="send-button flex row center gap-10">
+                    <h1 class="button-text">Send Password</h1>
+                    <img class="icon-25" src="icon/send.png"/>   
+                </div>
+            </div>
+
+            <div class="flex row center gap-10" style="width: inherit;">
+
+                <div class="send-button flex row center gap-5" style="width: 40%;">
+                    <h1  class="button-text">Restart</h1>
+                    <img style="width:35px;height:35px;" src="icon/on-off.png"/>
+                </div>
+
+                <div class="send-button flex row center gap-5" style="width: 40%;">
+                    <h1 class="button-text">Restore ESP</h1>
+                    <img class="icon-25" src="icon/restart.svg"/>
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+
+
+
+
+    
+    <script type="module" src="js/script.js"></script>
+    
+    
+</body>
+</html>
