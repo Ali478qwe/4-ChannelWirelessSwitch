@@ -1,5 +1,9 @@
 import {toggle,ButtonClickHandler} from "./toggle.js"
 
+//* Switch Control
+
+let Button = {"Button" : { "switch_name" : "string" , "state" :  false}};
+
 const switch_one_id = document.getElementById("switch-one");
 const switch_two_id = document.getElementById("switch-two");
 const switch_three_id = document.getElementById("switch-three");
@@ -7,20 +11,71 @@ const switch_four_id = document.getElementById("switch-four");
 
 function switch_style(){
     const state = this.button.querySelector("h1");
+
     (this.isOn == true) ? this.button.classList.add("button-on") : this.button.classList.add("button-off");
     (this.isOn == true) ? this.button.classList.remove("button-off") : this.button.classList.remove("button-on");
     state.textContent = (this.isOn == true) ?  "ON" : "OFF";
+
+    if (this.ClassID == 1){
+        Button.switch_name = "switch_one";
+    }
+    else if (this.ClassID == 2){
+        Button.switch_name = "switch-two"
+    }
+    else if (this.ClassID == 3){
+        Button.switch_name = "switch-three";
+    }
+    else if (this.ClassID == 4){
+        Button.switch_name = "switch-four";
+    }
+    else{
+        console.log("switch not defined with this class id");
+    }
+
+    Button.state = this.isOn;
+    console.log(`${Button.switch_name}`);
+    console.log(Button);
+    // if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN){
+    //     websocket.send(JSON.stringify(Button));
+    // }
+    // else{
+    //     console.warn("WebSocket is not connected or available.")
+    // }
+
 }
 
-const switch_one = new toggle(false,switch_style,switch_one_id);
-const switch_two = new toggle(false,switch_style,switch_two_id);
-const switch_three = new toggle(false,switch_style,switch_three_id);
-const switch_four = new toggle(false,switch_style,switch_four_id);
+
+const switch_one = new toggle(false,switch_style,switch_one_id,1);
+const switch_two = new toggle(false,switch_style,switch_two_id,2);
+const switch_three = new toggle(false,switch_style,switch_three_id,3);
+const switch_four = new toggle(false,switch_style,switch_four_id,4);
 
 switch_one.clickHandler();
 switch_two.clickHandler();
 switch_three.clickHandler();
 switch_four.clickHandler();
+
+function setSwitchesState(jsonSwitchObject){
+
+     if (jsonSwitchObject.Button.switch_name == "switch-one"){
+        switch_one.setState(jsonSwitchObject.Button.state);
+    }
+    else if (jsonSwitchObject.Button.switch_name == "switch-two"){
+        switch_two.setState(jsonSwitchObject.Button.state);
+    }
+    else if (jsonSwitchObject.Button.switch_name == "switch-three"){
+        switch_three.setState(jsonSwitchObject.Button.state);
+    }
+    else if (jsonSwitchObject.Button.switch_name == "switch_four"){
+        switch_four.setState(jsonSwitchObject.Button.state);
+    }
+    else{
+        console.log("we have not defineation object :\n", jsonSwitchObject);
+    }
+
+}
+
+//* Setting Control 
 
 const ControlPanel_id = document.getElementById("ControlPanel");
 const closeButtonControlPanel_id = document.getElementById("close-button");
@@ -50,6 +105,8 @@ const ControlPanel = new toggle(false,control_panel_func,closeButtonControlPanel
 
 ControlPanel.clickHandler();
 
+//* WiFi Setting 
+
 const WiFiSettingPanel_id = document.querySelector(".wifi-setting-panel");
 const WiFiSettingButton_id = document.querySelector(".wifi-setting");
 
@@ -60,7 +117,44 @@ function displayWiFiSettingPanel(){
 const WiFiSettingButton = new toggle(false,displayWiFiSettingPanel,WiFiSettingButton_id);
 
 WiFiSettingButton.clickHandler();
-WiFiSettingButton.setState(true);
+// WiFiSettingButton.setState(true);
+
+const PasswordVisibilityElement = document.querySelector(".password-visibility");
+const PasswordVisibilityIcon = PasswordVisibilityElement.querySelector("img");
+const PasswordFieldElement   = document.getElementById("wifi-password");
+
+function displayPassword(){
+    PasswordVisibilityIcon.src  =  (this.isOn == true) ?  "icon/eye.svg" : "icon/eye-off.svg";
+    PasswordFieldElement.type = (this.isOn == true) ? 'text' : 'password';
+}
+
+const PasswordVisibilityButton = new toggle(false,displayPassword,PasswordVisibilityElement);
+
+PasswordVisibilityButton.clickHandler();
 
 
+
+//* WebSocket 
+/*
+const ws_url = "ws:/192.168.4.1";
+const websocket = new WebSocket(ws_url);
+
+websocket.addEventListener("open", () => {
+    log("CONNECTED");
+});
+
+websocket.addEventListener("error", (e) =>{
+    console.error("WebSocket Error : ", e );
+});
+
+websocket.addEventListener("message" , (message) => {
+    let data = message.data;
+    let reciveObjects = JSON.parse(data);
+    setSwitchesState(reciveObjects);
+});
+
+websocket.addEventListener("close", () => {
+    log("DISCONNECTED");
+});
+*/
 

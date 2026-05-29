@@ -2,12 +2,13 @@ class toggle{
     isOn;
     button;
 
-    constructor(isOn=false,func_style,buttonElement) {
+    constructor(isOn=false,callableFunction,buttonElement,uniqueClassID=null) {
         this.isOn = isOn;
         this.button = buttonElement;
+        this.ClassID = uniqueClassID;
 
-        if(typeof func_style === "function"){
-            this.func_style = func_style.bind(this);
+        if(typeof callableFunction === "function"){
+            this.inlineFunction = callableFunction.bind(this);
         } 
         else{
           throw new Error("func_style must be function type.");
@@ -18,13 +19,13 @@ class toggle{
     clickHandler() {
         this.button.addEventListener("click", () => {
         this.isOn = !this.isOn;
-        this.func_style();
+        this.inlineFunction();
         });
     }
 
     setState(isOn) {
         this.isOn = isOn;
-        this.func_style();
+        this.inlineFunction();
     }
 
 }
