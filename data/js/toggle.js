@@ -11,7 +11,7 @@ class toggle{
             this.inlineFunction = callableFunction.bind(this);
         } 
         else{
-          throw new Error("func_style must be function type.");
+          throw new Error("callableFunction must be function type.");
         }
 
     }
@@ -32,7 +32,7 @@ class toggle{
 
 // function ButtonClickHandler(ButtonTextId,functionRef)
 function ButtonClickHandler(ButtonTextId,functionRef){
-      document.getElementById(id).addEventListener("click",functionRef);
+      document.getElementById(ButtonTextId).addEventListener("click",functionRef);
 }
 
 export { toggle , ButtonClickHandler };

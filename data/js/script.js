@@ -35,12 +35,12 @@ function switch_style(){
     Button.state = this.isOn;
     console.log(`${Button.switch_name}`);
     console.log(Button);
-    // if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN){
-    //     websocket.send(JSON.stringify(Button));
-    // }
-    // else{
-    //     console.warn("WebSocket is not connected or available.")
-    // }
+    if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN){
+        websocket.send(JSON.stringify(Button));
+    }
+    else{
+        console.warn("WebSocket is not connected or available.")
+    }
 
 }
 
@@ -57,17 +57,17 @@ switch_four.clickHandler();
 
 function setSwitchesState(jsonSwitchObject){
 
-     if (jsonSwitchObject.Button.switch_name == "switch-one"){
-        switch_one.setState(jsonSwitchObject.Button.state);
+     if (jsonSwitchObject.Switch.switch_name == "switch-one"){
+        switch_one.setState(jsonSwitchObject.Switch.state);
     }
-    else if (jsonSwitchObject.Button.switch_name == "switch-two"){
-        switch_two.setState(jsonSwitchObject.Button.state);
+    else if (jsonSwitchObject.Switch.switch_name == "switch-two"){
+        switch_two.setState(jsonSwitchObject.Switch.state);
     }
-    else if (jsonSwitchObject.Button.switch_name == "switch-three"){
-        switch_three.setState(jsonSwitchObject.Button.state);
+    else if (jsonSwitchObject.Switch.switch_name == "switch-three"){
+        switch_three.setState(jsonSwitchObject.Switch.state);
     }
-    else if (jsonSwitchObject.Button.switch_name == "switch_four"){
-        switch_four.setState(jsonSwitchObject.Button.state);
+    else if (jsonSwitchObject.Switch.switch_name == "switch_four"){
+        switch_four.setState(jsonSwitchObject.Switch.state);
     }
     else{
         console.log("we have not defineation object :\n", jsonSwitchObject);
@@ -105,6 +105,26 @@ const ControlPanel = new toggle(false,control_panel_func,closeButtonControlPanel
 
 ControlPanel.clickHandler();
 
+const themeButtonElement = document.querySelector(".theme");
+
+function changeTheme(){
+    const themeIcon = themeButtonElement.querySelector("img");
+    document.body.classList.add((this.isOn == true) ? "light-theme" : "dark-theme");
+    document.body.classList.remove((this.isOn == true) ?  "dark-theme" : "light-theme");
+    themeIcon.src = (this.isOn == true) ? "/icon/moon.png" : "/icon/sun.png" ;
+    window.localStorage.setItem("theme-mode",this.isOn);
+}
+
+const themeButton = new toggle(false,changeTheme,themeButtonElement,null);
+
+themeButton.clickHandler();
+
+if("theme-mode" in localStorage){
+    themeButton.setState(window.localStorage.getItem("theme-mode") === "true" ? true : false);
+}
+
+
+
 //* WiFi Setting 
 
 const WiFiSettingPanel_id = document.querySelector(".wifi-setting-panel");
@@ -132,15 +152,83 @@ const PasswordVisibilityButton = new toggle(false,displayPassword,PasswordVisibi
 
 PasswordVisibilityButton.clickHandler();
 
+ButtonClickHandler("send-wifi-name",() => {
+
+    const wifi_name = document.getElementById("wifi-name").value;
+
+    if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN && wifi_name.length > 0){
+        websocket.send(JSON.stringify({"setting" : { "wifi_name" : wifi_name}}));
+    }
+    else{
+        console.warn("WebSocket is not connected or available.")
+    }
+});
+
+ButtonClickHandler("send-wifi-password",() => {
+
+    const wifi_password = document.getElementById("wifi-password").value;
+
+    if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN && wifi_password.length > 0){
+        websocket.send(JSON.stringify({"setting" : { "wifi_password" : wifi_password}}));
+    }
+    else{
+        console.warn("WebSocket is not connected or available.")
+    }
+});
+
+ButtonClickHandler("restart",() => {
+     if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN){
+        websocket.send(JSON.stringify({"setting" : {"restart" : true}}));
+    }
+    else{
+        console.warn("WebSocket is not connected or available.")
+    }
+});
+
+ButtonClickHandler("restore",() =>{
+    if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN){
+        websocket.send(JSON.stringify({"setting" : {"restore" : true}}));
+    }
+    else{
+        console.warn("WebSocket is not connected or available.")
+    }
+});
+
 
 
 //* WebSocket 
-/*
-const ws_url = "ws:/192.168.4.1";
+
+
+const connectionElement = document.querySelector(".connection");
+const connectionStatsuElement = document.querySelector(".connection-status");
+const IPElement = document.querySelector(".local-ip");
+
+
+
+
+const ws_url = "ws://192.168.4.1:80";
 const websocket = new WebSocket(ws_url);
+
+IPElement.innerText = window.location.hostname;
+
+if (websocket.readyState === WebSocket.CONNECTING){
+    connectionStatsuElement.innerText = "CONNECTING";
+    connectionElement.style.borderColor = "yellow";
+    connectionElement.style.backgroundColor = "#ffe6007e";
+}
+else{
+    connectionStatsuElement.innerText = "DISCONNECTED";
+    connectionElement.style.borderColor = "gray";
+    connectionElement.style.backgroundColor = "#00000046";
+}
+
 
 websocket.addEventListener("open", () => {
     log("CONNECTED");
+    connectionStatsuElement.innerText = "CONNECTED";
+    connectionElement.style.borderColor = "green";
+    connectionElement.style.backgroundColor = "#00ff6a46";
+    
 });
 
 websocket.addEventListener("error", (e) =>{
@@ -155,6 +243,8 @@ websocket.addEventListener("message" , (message) => {
 
 websocket.addEventListener("close", () => {
     log("DISCONNECTED");
+    
+    connectionElement.style.border = "red";
 });
-*/
+
 
