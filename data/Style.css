@@ -184,7 +184,8 @@ body{
 }
 
 .wifi-setting-panel{
-    height: 500px;
+    height: auto;
+    padding: 15px;
     width: 380px;
     background-color:rgba(255, 255, 255, 0.137);
     position: fixed;
@@ -195,8 +196,10 @@ body{
 }
 
 .wifi-indent{
-    height: 480px;
-    width: 360px;
+    height:100%;
+    width: 100%;
+    padding: 25px 20px;
+    box-sizing: border-box;
     background-color: white;
     border-radius: 20px;
 }
@@ -208,6 +211,7 @@ label{
 
 input{
     height: 30px;
+    width:100%;
     border-radius: 10px;
     width: 288px;
     font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
