@@ -2,7 +2,7 @@ import {toggle,ButtonClickHandler} from "./toggle.js"
 
 //* Switch Control
 
-let Button = {"Button" : { "switch_name" : "string" , "state" :  false}};
+let Buttons = {Button : { switch_name : "" , state : false , "test": 1}};
 
 const switch_one_id = document.getElementById("switch-one");
 const switch_two_id = document.getElementById("switch-two");
@@ -17,43 +17,49 @@ function switch_style(){
     state.textContent = (this.isOn == true) ?  "ON" : "OFF";
 
     if (this.ClassID == 1){
-        Button.switch_name = "switch_one";
+       Buttons.Button.switch_name = "switch-one";
     }
     else if (this.ClassID == 2){
-        Button.switch_name = "switch-two"
+        Buttons.Button.switch_name = "switch-two"
     }
     else if (this.ClassID == 3){
-        Button.switch_name = "switch-three";
+        Buttons.Button.switch_name = "switch-three";
     }
     else if (this.ClassID == 4){
-        Button.switch_name = "switch-four";
+        Buttons.Button.switch_name = "switch-four";
     }
     else{
         console.log("switch not defined with this class id");
     }
 
-    Button.state = this.isOn;
-    console.log(`${Button.switch_name}`);
-    console.log(Button);
-    if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN){
-        websocket.send(JSON.stringify(Button));
+    Buttons.Button.state = this.isOn;
+    console.log(`${Buttons.Button.switch_name}`);
+    console.log(Buttons);
+    if (typeof websocket !== 'undefined' &&  websocket.readyState === websocket.OPEN && this.isOn != this.lastState && this.clickFlag == true){
+        this.clickFlag = false;
+        websocket.send(JSON.stringify(Buttons));
     }
-    else{
+    else if(this.clickFlag == true){
         console.warn("WebSocket is not connected or available.")
     }
 
 }
 
-
+var wsConnected = true;
 const switch_one = new toggle(false,switch_style,switch_one_id,1);
 const switch_two = new toggle(false,switch_style,switch_two_id,2);
 const switch_three = new toggle(false,switch_style,switch_three_id,3);
 const switch_four = new toggle(false,switch_style,switch_four_id,4);
 
-switch_one.clickHandler();
-switch_two.clickHandler();
-switch_three.clickHandler();
-switch_four.clickHandler();
+function enableClickHandler(){
+    switch_one.clickHandler();
+    switch_two.clickHandler();
+    switch_three.clickHandler();
+    switch_four.clickHandler();
+}
+
+
+
 
 function setSwitchesState(jsonSwitchObject){
 
@@ -66,7 +72,7 @@ function setSwitchesState(jsonSwitchObject){
     else if (jsonSwitchObject.Switch.switch_name == "switch-three"){
         switch_three.setState(jsonSwitchObject.Switch.state);
     }
-    else if (jsonSwitchObject.Switch.switch_name == "switch_four"){
+    else if (jsonSwitchObject.Switch.switch_name == "switch-four"){
         switch_four.setState(jsonSwitchObject.Switch.state);
     }
     else{
@@ -194,8 +200,6 @@ ButtonClickHandler("restore",() =>{
     }
 });
 
-
-
 //* WebSocket 
 
 
@@ -204,9 +208,7 @@ const connectionStatsuElement = document.querySelector(".connection-status");
 const IPElement = document.querySelector(".local-ip");
 
 
-
-
-const ws_url = "ws://192.168.4.1:80";
+const ws_url = "ws://192.168.4.1/ws";
 const websocket = new WebSocket(ws_url);
 
 IPElement.innerText = window.location.hostname;
@@ -224,7 +226,8 @@ else{
 
 
 websocket.addEventListener("open", () => {
-    log("CONNECTED");
+    console.log("CONNECTED");
+    enableClickHandler();
     connectionStatsuElement.innerText = "CONNECTED";
     connectionElement.style.borderColor = "green";
     connectionElement.style.backgroundColor = "#00ff6a46";
@@ -238,13 +241,16 @@ websocket.addEventListener("error", (e) =>{
 websocket.addEventListener("message" , (message) => {
     let data = message.data;
     let reciveObjects = JSON.parse(data);
+    console.log("receivedObject : ",reciveObjects);
     setSwitchesState(reciveObjects);
 });
 
 websocket.addEventListener("close", () => {
-    log("DISCONNECTED");
-    
-    connectionElement.style.border = "red";
+    console.log("DISCONNECTED");
+    connectionStatsuElement.innerText = "DISCONNECTED";
+    connectionElement.style.borderColor = "red";
+    connectionElement.style.backgroundColor = "#ff000046";
+
 });
 
 
