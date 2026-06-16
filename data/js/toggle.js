@@ -6,6 +6,9 @@ class toggle{
         this.isOn = isOn;
         this.button = buttonElement;
         this.ClassID = uniqueClassID;
+        this.lastState = isOn;
+        this.clickFlag = false;
+        this.setFlag = false;
 
         if(typeof callableFunction === "function"){
             this.inlineFunction = callableFunction.bind(this);
@@ -18,14 +21,24 @@ class toggle{
 
     clickHandler() {
         this.button.addEventListener("click", () => {
-        this.isOn = !this.isOn;
-        this.inlineFunction();
+            this.clickFlag = true;
+            this.lastState = this.isOn;
+            this.isOn = !this.isOn;
+            this.inlineFunction();
         });
     }
 
-    setState(isOn) {
-        this.isOn = isOn;
-        this.inlineFunction();
+    setState(inputState) {
+        this.setFlag = true;
+        if(inputState != this.isOn){
+            this.lastState = this.isOn;
+            this.isOn = inputState;
+            this.inlineFunction();
+        }
+        else{
+            this.inlineFunction();
+        }
+        
     }
 
 }
