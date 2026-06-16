@@ -10,10 +10,16 @@
 
 ## Web Page
 
-<div style="display: flex; flex-direction:row; justify-content: space-around; align-items: center; gap: 200px;">
-  <img src="https://github.com/Ali478qwe/4-ChannelWirelessSwitch/blob/ffeb844df78c419bcab7038e1266fc6b1d4ce7af/Contents/Picture/Web-Panel.PNG" style="marign-left: 100px;"/>
-  <img src="https://github.com/Ali478qwe/4-ChannelWirelessSwitch/blob/ffeb844df78c419bcab7038e1266fc6b1d4ce7af/Contents/Picture/WiFi-Setting.PNG" />
-</div>
+<table align="center">
+  <tr>
+    <td style="padding-right: 40px;">
+      <img src="https://raw.githubusercontent.com/Ali478qwe/4-ChannelWirelessSwitch/ffeb844df78c419bcab7038e1266fc6b1d4ce7af/Contents/Picture/Web-Panel.PNG" />
+    </td>
+    <td>
+      <img src="https://raw.githubusercontent.com/Ali478qwe/4-ChannelWirelessSwitch/ffeb844df78c419bcab7038e1266fc6b1d4ce7af/Contents/Picture/WiFi-Setting.PNG" />
+    </td>
+  </tr>
+</table>
 
 <br />
 
