@@ -5,7 +5,7 @@
 #include <FS.h>
 #include <SPIFFS.h>
 #include <Preferences.h>
-
+#include <RCSwitch.h>
 
 #define SWITCH_ONE_PIN 1
 #define SWITCH_TWO_PIN 2
@@ -13,11 +13,14 @@
 #define SWITCH_FOUR_PIN 10
 #define RXB22_DATA_PIN 8
 
-
+#define DELAY_TIME 500
+unsigned long timer;
 typedef struct {
     uint8_t relayPin;
     volatile bool relayState;
     String relayName;
+    unsigned long remoteCode;
+    unsigned long lastChangeTime;
 } relay_t;
 
 typedef struct{
@@ -29,17 +32,18 @@ wifi_setting APInfo;
 
 Preferences _flash;
 
-relay_t switch_one = {SWITCH_ONE_PIN,false,"switch-one"};
-relay_t switch_two = {SWITCH_TWO_PIN,false,"switch-two"};
-relay_t switch_three = {SWITCH_THREE_PIN,false,"switch-three"};
-relay_t switch_four = {SWITCH_FOUR_PIN,false,"switch-four"};
+relay_t switch_one = {SWITCH_ONE_PIN,false,"switch-one",111111};
+relay_t switch_two = {SWITCH_TWO_PIN,false,"switch-two",222222};
+relay_t switch_three = {SWITCH_THREE_PIN,false,"switch-three",333333};
+relay_t switch_four = {SWITCH_FOUR_PIN,false,"switch-four",444444};
 
-relay_t switchs[4] = {switch_one,switch_two,switch_three,switch_four};
+relay_t switches[4] = {switch_one,switch_two,switch_three,switch_four};
 
 const char * web_page_file = "/index.html";
 
 AsyncWebServer server(80);
 AsyncWebSocket web_socket("/ws");
+RCSwitch RXB22 = RCSwitch();
 
 IPAddress local_IP(192,168,4,1);
 IPAddress gateway(192,168,4,1);
@@ -96,7 +100,7 @@ void sendSwitchStatus(StaticJsonDocument<256>& sendMessage,String switch_name,bo
 
 void switchStatusSender(void){
     for(uint8_t index = 0; index < 4;index++){
-      sendSwitchStatus(sendMessage,switchs[index].relayName,switchs[index].relayState);
+      sendSwitchStatus(sendMessage,switches[index].relayName,switches[index].relayState);
     }
 }
 
@@ -198,17 +202,29 @@ void ChangeSettings(StaticJsonDocument<256>& receivedMessage){
     Serial.println("_________________________________________");
 }
   
-void setSwitchesFromWebServer(StaticJsonDocument<256>& receivedMessage){
+void setSwitchesWithWebServer(StaticJsonDocument<256>& receivedMessage){
     if(!receivedMessage.containsKey("Button")) return;
 
     if(receivedMessage.containsKey("Button")){
       for(uint8_t index =0;index < 4;index++){
-        if(switchs[index].relayName == receivedMessage["Button"]["switch_name"]){
-          switchs[index].relayState = ! switchs[index].relayState;
-          digitalWrite(switchs[index].relayPin,switchs[index].relayState ? HIGH : LOW);
+        if(switches[index].relayName == receivedMessage["Button"]["switch_name"]){
+          switches[index].relayState = ! switches[index].relayState;
+          digitalWrite(switches[index].relayPin,switches[index].relayState ? HIGH : LOW);
+          sendSwitchStatus(sendMessage, switches[index].relayName, switches[index].relayState);
         }
       }
     }
+}
+
+void setSwitchesWithRXB22(unsigned long remoteCode){
+  for(uint8_t index =0;index < 4;index++){
+        if(switches[index].remoteCode == remoteCode && timer - switches[index].lastChangeTime > DELAY_TIME){
+          switches[index].lastChangeTime = timer;
+          switches[index].relayState = ! switches[index].relayState;
+          digitalWrite(switches[index].relayPin,switches[index].relayState ? HIGH : LOW);
+          sendSwitchStatus(sendMessage, switches[index].relayName, switches[index].relayState);
+        }
+      }
 }
 
 
@@ -223,6 +239,8 @@ void setup(){
     pinMode(RXB22_DATA_PIN,INPUT);
 
     Serial.begin(115200);
+
+    RXB22.enableReceive(8);
 
     LoadSetting("RemoteSwitch","");
 
@@ -247,6 +265,8 @@ void setup(){
 
 void loop(){
 
+    timer = millis();
+
     if(wsNewMessage){
       wsNewMessage = false;
 
@@ -254,9 +274,16 @@ void loop(){
 
       if(json_flag){
         ChangeSettings(receivedMessage);
-        setSwitchesFromWebServer(receivedMessage);
+        setSwitchesWithWebServer(receivedMessage);
       }
       Serial.println(wsMessage);
+    }
+
+    if(RXB22.available()){
+        unsigned long remoteReceivedCode = RXB22.getReceivedValue();
+        Serial.printf("Received Code : %ul",remoteReceivedCode);
+        setSwitchesWithRXB22(remoteReceivedCode);
+        RXB22.resetAvailable();
     }
 
     web_socket.cleanupClients();
